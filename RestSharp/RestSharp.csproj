@@ -100,8 +100,11 @@
     <Compile Include="Compression\ZLib\ZLibCodec.cs" />
     <Compile Include="Compression\ZLib\ZLibConstants.cs" />
     <Compile Include="Compression\ZLib\ZLibStream.cs" />
+    <Compile Include="Deserializers\DefaultTypeHandler.cs" />
+    <Compile Include="Deserializers\ITypeHandler.cs" />
     <Compile Include="Deserializers\JsonDeserializer.cs" />
     <Compile Include="Deserializers\DeserializeAsAttribute.cs" />
+    <Compile Include="Deserializers\ReflectionTypeHandler.cs" />
     <Compile Include="Deserializers\XmlAttributeDeserializer.cs" />
     <Compile Include="Extensions\MonoHttp\Helpers.cs" />
     <Compile Include="Extensions\MonoHttp\HtmlEncoder.cs" />

@@ -19,6 +19,13 @@ namespace RestSharp.Deserializers
 			Culture = CultureInfo.InvariantCulture;
 		}
 
+		private Dictionary<Type, ITypeHandler> _typeHandlers = new Dictionary<Type, ITypeHandler>();
+
+		public void AddTypeHandler(Type type, ITypeHandler handler)
+		{
+			_typeHandlers[type] = handler;
+		}
+
 		public T Deserialize<T>(IRestResponse response)
 		{
 			var target = Activator.CreateInstance<T>();
@@ -239,9 +246,16 @@ namespace RestSharp.Deserializers
 
 		private object CreateAndMap(Type type, object element)
 		{
+			var data = (IDictionary<string, object>)element;
+
+			if (_typeHandlers.ContainsKey(type))
+			{
+				type = _typeHandlers[type].GetType(data) ?? type;
+			}
+
 			var instance = Activator.CreateInstance(type);
 
-			Map(instance, (IDictionary<string, object>)element);
+			Map(instance, data);
 
 			return instance;
 		}
