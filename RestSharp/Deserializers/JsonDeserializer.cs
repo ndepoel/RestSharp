@@ -91,11 +91,15 @@ namespace RestSharp.Deserializers
 		{
 			var dict = (IDictionary)Activator.CreateInstance(type);
 			var valueType = type.GetGenericArguments()[1];
-			foreach (var child in (IDictionary<string, object>)parent)
+
+			if (parent is IDictionary<string, object>)
 			{
-				var key = child.Key;
-				var item = ConvertValue(valueType, child.Value);
-				dict.Add(key, item);
+				foreach (var child in (IDictionary<string, object>)parent)
+				{
+					var key = child.Key;
+					var item = ConvertValue(valueType, child.Value);
+					dict.Add(key, item);
+				}
 			}
 
 			return dict;
@@ -139,10 +143,7 @@ namespace RestSharp.Deserializers
 					}
 				}
 			}
-			else
-			{
-				list.Add(ConvertValue(itemType, parent));
-			}
+
 			return list;
 		}
 
