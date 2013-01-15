@@ -117,11 +117,14 @@ namespace RestSharp.Deserializers
 			var list = (IList)Activator.CreateInstance(type);
 			var listType = type.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IList<>));
 			var itemType = listType.GetGenericArguments()[0];
-
+   
 			if (parent is IList)
 			{
-				foreach (var element in (IList)parent)
+                var parentList = (IList)parent;
+                for (int idx = 0; idx < parentList.Count; ++idx)
 				{
+                    var element = parentList[idx];
+
 					if (itemType.IsPrimitive)
 					{
 						var value = element.ToString();

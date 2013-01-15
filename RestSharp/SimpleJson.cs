@@ -1041,8 +1041,8 @@ namespace RestSharp
                 IDictionary<string, string> dict = (IDictionary<string, string>)value;
                 success = SerializeObject(jsonSerializerStrategy, dict.Keys, dict.Values, builder);
             }
-            else if (value is IEnumerable)
-                success = SerializeArray(jsonSerializerStrategy, (IEnumerable)value, builder);
+            else if (value is IList)
+                success = SerializeArray(jsonSerializerStrategy, (IList)value, builder);
             else if (IsNumeric(value))
                 success = SerializeNumber(value, builder);
             else if (value is Boolean)
@@ -1092,13 +1092,15 @@ namespace RestSharp
             return true;
         }
 
-        protected static bool SerializeArray(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable anArray, StringBuilder builder)
+        protected static bool SerializeArray(IJsonSerializerStrategy jsonSerializerStrategy, IList anArray, StringBuilder builder)
         {
             builder.Append("[");
 
             bool first = true;
-            foreach (object value in anArray)
+            for (int idx = 0; idx < anArray.Count; ++idx)
             {
+                object value = anArray[idx];
+                
                 if (!first)
                     builder.Append(",");
 
