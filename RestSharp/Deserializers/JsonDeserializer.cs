@@ -156,42 +156,45 @@ namespace RestSharp.Deserializers
 
 			return list;
 		}
-
+  
+        private string Stringify(object value)
+        {
+            return Convert.ToString(value, Culture);
+        }
+        
 		private object ConvertValue(Type type, object value)
 		{
-			var stringValue = Convert.ToString(value, Culture);
-
 			if (type.IsPrimitive)
 			{
 				// no primitives can contain quotes so we can safely remove them
 				// allows converting a json value like {"index": "1"} to an int
-				var tmpVal = stringValue.Replace("\"", string.Empty);
+				var tmpVal = Stringify(value).Replace("\"", string.Empty);
 
 				return tmpVal.ChangeType(type, Culture);
 			}
 			else if (type.IsEnum)
 			{
-				return type.FindEnumValue(stringValue, Culture);
+				return type.FindEnumValue(Stringify(value), Culture);
 			}
 			else if (type == typeof(Uri))
 			{
-				return new Uri(stringValue, UriKind.RelativeOrAbsolute);
+				return new Uri(Stringify(value), UriKind.RelativeOrAbsolute);
 			}
 			else if (type == typeof(string))
 			{
-				return stringValue;
+				return Stringify(value);
 			}
 			else if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
 			{
 				DateTime dt;
 				if (DateFormat.HasValue())
 				{
-					dt = DateTime.ParseExact(stringValue, DateFormat, Culture);
+					dt = DateTime.ParseExact(Stringify(value), DateFormat, Culture);
 				}
 				else
 				{
 					// try parsing instead
-					dt = stringValue.ParseJsonDate(Culture);
+					dt = Stringify(value).ParseJsonDate(Culture);
 				}
 
 				if (type == typeof(DateTime))
@@ -205,15 +208,15 @@ namespace RestSharp.Deserializers
 			}
 			else if (type == typeof(Decimal))
 			{
-				return Decimal.Parse(stringValue, Culture);
+				return Decimal.Parse(Stringify(value), Culture);
 			}
 			else if (type == typeof(Guid))
 			{
-				return string.IsNullOrEmpty(stringValue) ? Guid.Empty : new Guid(stringValue);
+				return string.IsNullOrEmpty(Stringify(value)) ? Guid.Empty : new Guid(Stringify(value));
 			}
 			else if (type == typeof(TimeSpan))
 			{
-				return TimeSpan.Parse(stringValue);
+				return TimeSpan.Parse(Stringify(value));
 			}
 			else if (type.IsGenericType)
 			{
