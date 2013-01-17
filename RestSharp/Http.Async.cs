@@ -394,7 +394,7 @@ namespace RestSharp
 				webRequest.ClientCertificates = ClientCertificates;
 			}
 			
-			webRequest.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip | DecompressionMethods.None;
+			webRequest.AutomaticDecompression = DecompressionMethods.None;
 			ServicePointManager.Expect100Continue = false;
 
 			if (Timeout != 0)
