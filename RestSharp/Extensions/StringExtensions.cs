@@ -11,7 +11,7 @@
 //   distributed under the License is distributed on an "AS IS" BASIS,
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
-//   limitations under the License. 
+//   limitations under the License.
 #endregion
 
 using System;
@@ -159,12 +159,12 @@ namespace RestSharp.Extensions
 		private static DateTime ParseFormattedDate(string input, CultureInfo culture)
 		{
 			var formats = new[] {
-				"u", 
-				"s", 
-				"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'", 
-				"yyyy-MM-ddTHH:mm:ssZ", 
-				"yyyy-MM-dd HH:mm:ssZ", 
-				"yyyy-MM-ddTHH:mm:ss", 
+				"u",
+				"s",
+				"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'",
+				"yyyy-MM-ddTHH:mm:ssZ",
+				"yyyy-MM-dd HH:mm:ssZ",
+				"yyyy-MM-ddTHH:mm:ss",
 				"yyyy-MM-ddTHH:mm:sszzzzzz",
 				"M/d/yyyy h:mm:ss tt" // default format for invariant culture
 			};
@@ -280,6 +280,17 @@ namespace RestSharp.Extensions
 		}
 
 		/// <summary>
+		/// Make the last acronym in the string, if any, uppercase.
+		/// </summary>
+		/// <param name="camelCased">String to convert</param>
+		/// <param name="culture"></param>
+		/// <returns>String</returns>
+		public static string LastAcronymUppercase(this string camelCased, CultureInfo culture)
+		{
+			return Regex.Replace(camelCased, @"[A-Z][a-z]+$", match => match.ToString().ToUpper(culture));
+		}
+
+		/// <summary>
 		/// Convert the first letter of a string to lower case
 		/// </summary>
 		/// <param name="word">String to convert</param>
@@ -352,6 +363,9 @@ namespace RestSharp.Extensions
 
 			// try camel cased name
 			yield return name.ToCamelCase(culture);
+
+			// try camel cased name with uppercase trailing possible acronym
+			yield return name.ToCamelCase(culture).LastAcronymUppercase(culture);
 
 			// try lower cased name
 			yield return name.ToLower(culture);
