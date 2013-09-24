@@ -114,43 +114,55 @@ namespace RestSharp.Deserializers
 
 		private IList BuildList(Type type, object parent)
 		{
-			var list = (IList)Activator.CreateInstance(type);
-			var listType = type.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IList<>));
-			var itemType = listType.GetGenericArguments()[0];
-   
+			IList list;
+			Type itemType;
+			var useAdd = false;
+
+			if (type.IsGenericType)
+			{
+				list = (IList)Activator.CreateInstance(type);
+				useAdd = true;
+				var listType = type.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof (IList<>));
+				itemType = listType.GetGenericArguments()[0];
+			}
+			else
+			{
+				itemType = type.GetElementType();
+				list = Array.CreateInstance(itemType, parent is IList ? ((IList) parent).Count : 0);
+			}
+
 			if (parent is IList)
 			{
                 var parentList = (IList)parent;
                 for (int idx = 0; idx < parentList.Count; ++idx)
 				{
                     var element = parentList[idx];
+					object value = null;
 
 					if (itemType.IsPrimitive)
 					{
-						var value = element.ToString();
-						list.Add(value.ChangeType(itemType, Culture));
+						value = element.ToString();
+						value = value.ChangeType(itemType, Culture);
 					}
 					else if (itemType == typeof(string))
 					{
-						if (element == null)
+						if (element != null)
 						{
-							list.Add(null);
-							continue;
+							value = element.ToString();
 						}
-
-						list.Add(element.ToString());
 					}
 					else
 					{
-						if (element == null)
+						if (element != null)
 						{
-							list.Add(null);
-							continue;
+							value = ConvertValue(itemType, element);
 						}
-
-						var item = ConvertValue(itemType, element);
-						list.Add(item);
 					}
+
+					if (useAdd)
+						list.Add(value);
+					else
+						list[idx] = value;
 				}
 			}
 
@@ -240,6 +252,10 @@ namespace RestSharp.Deserializers
 					// nested property classes
 					return CreateAndMap(type, value);
 				}
+			}
+			else if (type.IsArray)
+			{
+				return BuildList(type, value);
 			}
 			else
 			{
