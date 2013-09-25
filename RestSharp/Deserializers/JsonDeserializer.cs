@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using RestSharp;
 using RestSharp.Extensions;
 
 namespace RestSharp.Deserializers
@@ -118,11 +119,11 @@ namespace RestSharp.Deserializers
 			Type itemType;
 			var useAdd = false;
 
-			if (type.IsGenericType)
+			if (!type.IsArray)
 			{
 				list = (IList)Activator.CreateInstance(type);
 				useAdd = true;
-				var listType = type.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof (IList<>));
+				var listType = type.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IList<>));
 				itemType = listType.GetGenericArguments()[0];
 			}
 			else
